@@ -1,40 +1,63 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/kiku99/morama/internal/models"
+	"github.com/kiku99/morama/internal/storage"
 	"github.com/spf13/cobra"
 )
 
-// showCmd represents the show command
 var showCmd = &cobra.Command{
-	Use:   "show",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:   "show [title]",
+	Short: "Show detailed info of a movie or drama",
+	Long: `Show the detailed record of a movie or drama entry.
+Example:
+  morama show "슬기로운 전공의 생활" --drama`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("show called")
+		title := args[0]
+		isMovie, _ := cmd.Flags().GetBool("movie")
+		isDrama, _ := cmd.Flags().GetBool("drama")
+
+		if (isMovie && isDrama) || (!isMovie && !isDrama) {
+			fmt.Println("❌ Please specify either --movie or --drama (but not both)")
+			return
+		}
+
+		var mediaType models.MediaType
+		if isMovie {
+			mediaType = models.Movie
+		} else {
+			mediaType = models.Drama
+		}
+
+		store, err := storage.NewStorage()
+		if err != nil {
+			fmt.Printf("❌ Error opening database: %v\n", err)
+			return
+		}
+		defer store.Close()
+
+		entry, err := store.FindByTitleAndType(title, mediaType)
+		if err != nil {
+			fmt.Printf("❌ %v\n", err)
+			return
+		}
+
+		fmt.Println(strings.Repeat("━", 60))
+		fmt.Printf("📌 제목        : %s\n", entry.Title)
+		fmt.Printf("🎞️ 유형        : %s\n", strings.Title(string(entry.Type)))
+		fmt.Printf("⭐ 평점        : %.1f / 5.0\n", entry.Rating)
+		fmt.Printf("🗓️ 시청일      : %s\n", entry.DateWatched.Format("2006-01-02"))
+		fmt.Printf("💬 한줄평      : %s\n", entry.Comment)
+		fmt.Println(strings.Repeat("━", 60))
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(showCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// showCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// showCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	showCmd.Flags().Bool("movie", false, "Show movie entry")
+	showCmd.Flags().Bool("drama", false, "Show drama entry")
 }
