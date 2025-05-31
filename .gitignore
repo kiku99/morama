@@ -80,3 +80,4 @@ tmp/
 debug
 debug.test
 .vscode/launch.json
+.idea/
