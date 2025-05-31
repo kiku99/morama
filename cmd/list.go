@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/kiku99/morama/internal/storage"
-	"github.com/mattn/go-runewidth"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )
@@ -73,20 +72,13 @@ func calculateTableWidths() tableWidths {
 	contentWidth := termWidth - borderSpace
 
 	return tableWidths{
-		id:        max(int(float64(contentWidth)*idRatio), minIdWidth),
-		title:     max(int(float64(contentWidth)*titleRatio), minTitleWidth),
-		entryType: max(int(float64(contentWidth)*typeRatio), minTypeWidth),
-		rating:    max(int(float64(contentWidth)*ratingRatio), minRatingWidth),
-		date:      max(int(float64(contentWidth)*dateRatio), minDateWidth),
-		comment:   max(int(float64(contentWidth)*commentRatio), minCommentWidth),
+		id:        maxInt(int(float64(contentWidth)*idRatio), minIdWidth),
+		title:     maxInt(int(float64(contentWidth)*titleRatio), minTitleWidth),
+		entryType: maxInt(int(float64(contentWidth)*typeRatio), minTypeWidth),
+		rating:    maxInt(int(float64(contentWidth)*ratingRatio), minRatingWidth),
+		date:      maxInt(int(float64(contentWidth)*dateRatio), minDateWidth),
+		comment:   maxInt(int(float64(contentWidth)*commentRatio), minCommentWidth),
 	}
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
 }
 
 var listCmd = &cobra.Command{
@@ -181,41 +173,6 @@ var listCmd = &cobra.Command{
 				strings.Repeat("─", widths.comment))
 		}
 	},
-}
-
-// truncateStringWithWidth truncates string considering display width (for CJK characters)
-func truncateStringWithWidth(s string, maxWidth int) string {
-	if runewidth.StringWidth(s) <= maxWidth {
-		return s
-	}
-
-	var result []rune
-	currentWidth := 0
-
-	for _, r := range s {
-		runeWidth := runewidth.RuneWidth(r)
-		if currentWidth+runeWidth > maxWidth-3 { // Reserve space for "..."
-			break
-		}
-		result = append(result, r)
-		currentWidth += runeWidth
-	}
-
-	return string(result) + "..."
-}
-
-// padStringToWidth pads string to exact display width
-func padStringToWidth(s string, targetWidth int) string {
-	currentWidth := runewidth.StringWidth(s)
-	if currentWidth >= targetWidth {
-		return s
-	}
-
-	padding := targetWidth - currentWidth
-	for i := 0; i < padding; i++ {
-		s += " "
-	}
-	return s
 }
 
 func init() {
