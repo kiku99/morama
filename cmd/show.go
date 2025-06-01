@@ -20,7 +20,6 @@ var showCmd = &cobra.Command{
   morama show "슬기로울 전공의 생활" --drama
   morama show "인셉션" --movie`,
 
-	// 인자로 정확히 1개의 [title]을 받아야 함
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		title := args[0]
@@ -46,13 +45,23 @@ var showCmd = &cobra.Command{
 		}
 		defer store.Close()
 
-		entry, err := store.FindByTitleAndType(title, mediaType)
+		entries, err := store.FindAllByTitleAndType(title, mediaType)
 		if err != nil {
-			fmt.Printf("❌ %v\n", err)
+			fmt.Printf("❌ 검색 중 오류 발생: %v\n", err)
 			return
 		}
 
-		printEntryBox(entry)
+		if len(entries) == 0 {
+			fmt.Printf("‼️ \"%s\" (%s)에 해당하는 항목이 없습니다.\n", title, mediaType)
+			return
+		}
+
+		for i, entry := range entries {
+			if len(entries) > 1 {
+				fmt.Printf("\n📄 결과 %d/%d\n", i+1, len(entries))
+			}
+			printEntryBox(&entry)
+		}
 	},
 }
 

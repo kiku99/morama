@@ -280,29 +280,41 @@ func (s *Storage) GetStats() (map[string]interface{}, error) {
 	return stats, nil
 }
 
-func (s *Storage) FindByTitleAndType(title string, mediaType models.MediaType) (*models.MediaEntry, error) {
-	// media 테이블에서 제목과 유형이 일치하는 첫 번째 레코드를 가져옴
+func (s *Storage) FindAllByTitleAndType(title string, mediaType models.MediaType) ([]models.MediaEntry, error) {
 	query := `
 	SELECT id, title, type, rating, comment, date_watched, created_at
 	FROM media
 	WHERE title = ? AND type = ?
-	LIMIT 1
+	ORDER BY date_watched DESC
 	`
 
-	row := s.db.QueryRow(query, title, string(mediaType))
-
-	var entry models.MediaEntry
-	var typeStr, watchedStr, createdStr string
-	err := row.Scan(
-		&entry.ID, &entry.Title, &typeStr, &entry.Rating, &entry.Comment, &watchedStr, &createdStr,
-	)
+	rows, err := s.db.Query(query, title, string(mediaType))
 	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var entries []models.MediaEntry
+	for rows.Next() {
+		var entry models.MediaEntry
+		var typeStr, watchedStr, createdStr string
+
+		if err := rows.Scan(
+			&entry.ID, &entry.Title, &typeStr, &entry.Rating, &entry.Comment, &watchedStr, &createdStr,
+		); err != nil {
+			return nil, err
+		}
+
+		entry.Type = models.MediaType(typeStr)
+		entry.DateWatched, _ = parseTime(watchedStr)
+		entry.CreatedAt, _ = parseTime(createdStr)
+
+		entries = append(entries, entry)
+	}
+
+	if len(entries) == 0 {
 		return nil, fmt.Errorf("entry not found for \"%s\" (%s)", title, mediaType)
 	}
 
-	entry.Type = models.MediaType(typeStr)
-	entry.DateWatched, _ = parseTime(watchedStr)
-	entry.CreatedAt, _ = parseTime(createdStr)
-
-	return &entry, nil
+	return entries, nil
 }
