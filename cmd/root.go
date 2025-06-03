@@ -18,7 +18,7 @@ your watched movies and dramas. You can add new entries with ratings
 and comments, and view them in a beautiful table format.
 
 Examples:
-  morama add "슬기로운 전생활" --drama
+  morama add "언젠가는 슬기로울 전공의생활" --drama
   morama add "인셉션" --movie  
   morama list`,
 	// Uncomment the following line if your bare application
