@@ -9,6 +9,7 @@ import (
 
 	"github.com/kiku99/morama/internal/models"
 	"github.com/kiku99/morama/internal/storage"
+	"github.com/kiku99/morama/internal/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -86,6 +87,6 @@ func printEntryBox(entry *models.MediaEntry) {
 }
 
 func formatField(label string, value string, labelWidth int) string {
-	labelPadded := padStringToWidth(label, labelWidth)
+	labelPadded := utils.PadStringToWidth(label, labelWidth)
 	return fmt.Sprintf("%s : %s", labelPadded, value)
 }

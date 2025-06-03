@@ -1,4 +1,4 @@
-package cmd
+package utils
 
 import (
 	"strings"
@@ -6,7 +6,7 @@ import (
 	"github.com/mattn/go-runewidth"
 )
 
-func padStringToWidth(s string, targetWidth int) string {
+func PadStringToWidth(s string, targetWidth int) string {
 	currentWidth := runewidth.StringWidth(s)
 	if currentWidth >= targetWidth {
 		return s
@@ -15,7 +15,7 @@ func padStringToWidth(s string, targetWidth int) string {
 	return s + strings.Repeat(" ", padding)
 }
 
-func truncateStringWithWidth(s string, maxWidth int) string {
+func TruncateStringWithWidth(s string, maxWidth int) string {
 	if runewidth.StringWidth(s) <= maxWidth {
 		return s
 	}
@@ -35,7 +35,7 @@ func truncateStringWithWidth(s string, maxWidth int) string {
 	return string(result) + "..."
 }
 
-func maxInt(a, b int) int {
+func MaxInt(a, b int) int {
 	if a > b {
 		return a
 	}
