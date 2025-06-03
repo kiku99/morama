@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/kiku99/morama/internal/storage"
-	"github.com/mattn/go-runewidth"
+	"github.com/kiku99/morama/internal/utils"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )
@@ -73,20 +73,13 @@ func calculateTableWidths() tableWidths {
 	contentWidth := termWidth - borderSpace
 
 	return tableWidths{
-		id:        max(int(float64(contentWidth)*idRatio), minIdWidth),
-		title:     max(int(float64(contentWidth)*titleRatio), minTitleWidth),
-		entryType: max(int(float64(contentWidth)*typeRatio), minTypeWidth),
-		rating:    max(int(float64(contentWidth)*ratingRatio), minRatingWidth),
-		date:      max(int(float64(contentWidth)*dateRatio), minDateWidth),
-		comment:   max(int(float64(contentWidth)*commentRatio), minCommentWidth),
+		id:        utils.MaxInt(int(float64(contentWidth)*idRatio), minIdWidth),
+		title:     utils.MaxInt(int(float64(contentWidth)*titleRatio), minTitleWidth),
+		entryType: utils.MaxInt(int(float64(contentWidth)*typeRatio), minTypeWidth),
+		rating:    utils.MaxInt(int(float64(contentWidth)*ratingRatio), minRatingWidth),
+		date:      utils.MaxInt(int(float64(contentWidth)*dateRatio), minDateWidth),
+		comment:   utils.MaxInt(int(float64(contentWidth)*commentRatio), minCommentWidth),
 	}
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
 }
 
 var listCmd = &cobra.Command{
@@ -140,12 +133,12 @@ var listCmd = &cobra.Command{
 				strings.Repeat("━", widths.comment))
 
 			fmt.Printf("┃%s┃%s┃%s┃%s┃%s┃%s┃\n",
-				padStringToWidth("ID", widths.id),
-				padStringToWidth("Title", widths.title),
-				padStringToWidth("Type", widths.entryType),
-				padStringToWidth("Rating", widths.rating),
-				padStringToWidth("Date Watched", widths.date),
-				padStringToWidth("Comment", widths.comment))
+				utils.PadStringToWidth("ID", widths.id),
+				utils.PadStringToWidth("Title", widths.title),
+				utils.PadStringToWidth("Type", widths.entryType),
+				utils.PadStringToWidth("Rating", widths.rating),
+				utils.PadStringToWidth("Date Watched", widths.date),
+				utils.PadStringToWidth("Comment", widths.comment))
 
 			fmt.Printf("┡%s╇%s╇%s╇%s╇%s╇%s┩\n",
 				strings.Repeat("━", widths.id),
@@ -157,19 +150,19 @@ var listCmd = &cobra.Command{
 
 			for _, entry := range entries {
 				id := fmt.Sprintf("%d", entry.ID)
-				title := truncateStringWithWidth(entry.Title, widths.title)
+				title := utils.TruncateStringWithWidth(entry.Title, widths.title)
 				entryType := string(entry.Type)
 				rating := fmt.Sprintf("%.1f", entry.Rating)
 				dateStr := entry.DateWatched.Format("Jan 02, 2006")
-				comment := truncateStringWithWidth(entry.Comment, widths.comment)
+				comment := utils.TruncateStringWithWidth(entry.Comment, widths.comment)
 
 				fmt.Printf("│%s│%s│%s│%s│%s│%s│\n",
-					padStringToWidth(id, widths.id),
-					padStringToWidth(title, widths.title),
-					padStringToWidth(entryType, widths.entryType),
-					padStringToWidth(rating, widths.rating),
-					padStringToWidth(dateStr, widths.date),
-					padStringToWidth(comment, widths.comment))
+					utils.PadStringToWidth(id, widths.id),
+					utils.PadStringToWidth(title, widths.title),
+					utils.PadStringToWidth(entryType, widths.entryType),
+					utils.PadStringToWidth(rating, widths.rating),
+					utils.PadStringToWidth(dateStr, widths.date),
+					utils.PadStringToWidth(comment, widths.comment))
 			}
 
 			fmt.Printf("└%s┴%s┴%s┴%s┴%s┴%s┘\n",
@@ -181,41 +174,6 @@ var listCmd = &cobra.Command{
 				strings.Repeat("─", widths.comment))
 		}
 	},
-}
-
-// truncateStringWithWidth truncates string considering display width (for CJK characters)
-func truncateStringWithWidth(s string, maxWidth int) string {
-	if runewidth.StringWidth(s) <= maxWidth {
-		return s
-	}
-
-	var result []rune
-	currentWidth := 0
-
-	for _, r := range s {
-		runeWidth := runewidth.RuneWidth(r)
-		if currentWidth+runeWidth > maxWidth-3 { // Reserve space for "..."
-			break
-		}
-		result = append(result, r)
-		currentWidth += runeWidth
-	}
-
-	return string(result) + "..."
-}
-
-// padStringToWidth pads string to exact display width
-func padStringToWidth(s string, targetWidth int) string {
-	currentWidth := runewidth.StringWidth(s)
-	if currentWidth >= targetWidth {
-		return s
-	}
-
-	padding := targetWidth - currentWidth
-	for i := 0; i < padding; i++ {
-		s += " "
-	}
-	return s
 }
 
 func init() {
