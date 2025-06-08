@@ -279,3 +279,42 @@ func (s *Storage) GetStats() (map[string]interface{}, error) {
 
 	return stats, nil
 }
+
+func (s *Storage) FindAllByTitleAndType(title string, mediaType models.MediaType) ([]models.MediaEntry, error) {
+	query := `
+	SELECT id, title, type, rating, comment, date_watched, created_at
+	FROM media
+	WHERE title = ? AND type = ?
+	ORDER BY date_watched DESC
+	`
+
+	rows, err := s.db.Query(query, title, string(mediaType))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var entries []models.MediaEntry
+	for rows.Next() {
+		var entry models.MediaEntry
+		var typeStr, watchedStr, createdStr string
+
+		if err := rows.Scan(
+			&entry.ID, &entry.Title, &typeStr, &entry.Rating, &entry.Comment, &watchedStr, &createdStr,
+		); err != nil {
+			return nil, err
+		}
+
+		entry.Type = models.MediaType(typeStr)
+		entry.DateWatched, _ = parseTime(watchedStr)
+		entry.CreatedAt, _ = parseTime(createdStr)
+
+		entries = append(entries, entry)
+	}
+
+	if len(entries) == 0 {
+		return nil, fmt.Errorf("entry not found for \"%s\" (%s)", title, mediaType)
+	}
+
+	return entries, nil
+}
