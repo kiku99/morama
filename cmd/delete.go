@@ -1,40 +1,63 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
 	"fmt"
 
+	"github.com/kiku99/morama/internal/models"
+	"github.com/kiku99/morama/internal/storage"
 	"github.com/spf13/cobra"
 )
 
-// deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
-	Use:   "delete",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Use:   "delete [title]",
+	Short: "기록을 삭제합니다",
+	Long: `입력한 제목의 영화 또는 드라마 기록을 삭제합니다.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+예시:
+  morama delete "슬기로운 전공의 생활" --drama
+  morama delete "인셉션" --movie`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("delete called")
+		title := args[0]
+
+		isMovie, _ := cmd.Flags().GetBool("movie")
+		isDrama, _ := cmd.Flags().GetBool("drama")
+
+		if (isMovie && isDrama) || (!isMovie && !isDrama) {
+			fmt.Println("❌ Please specify either --movie or --drama (but not both)")
+			return
+		}
+
+		var mediaType models.MediaType
+		if isMovie {
+			mediaType = models.Movie
+		} else {
+			mediaType = models.Drama
+		}
+
+		store, err := storage.NewStorage()
+		if err != nil {
+			fmt.Printf("❌ 데이터베이스 열기 실패: %v\n", err)
+			return
+		}
+		defer store.Close()
+
+		deleted, err := store.DeleteByTitleAndType(title, mediaType)
+		if err != nil {
+			fmt.Printf("❌ 삭제 실패: %v\n", err)
+			return
+		}
+
+		if deleted == 0 {
+			fmt.Printf("⚠️ \"%s\" (%s) 항목을 찾을 수 없습니다.\n", title, mediaType)
+		} else {
+			fmt.Printf("🗑️ \"%s\" (%s) 항목 %d개를 삭제했습니다.\n", title, mediaType, deleted)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(deleteCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// deleteCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// deleteCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	deleteCmd.Flags().Bool("movie", false, "영화로 삭제")
+	deleteCmd.Flags().Bool("drama", false, "드라마로 삭제")
 }
