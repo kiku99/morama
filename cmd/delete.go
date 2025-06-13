@@ -17,7 +17,7 @@ var deleteCmd = &cobra.Command{
 예시:
   morama delete 3 --drama          # ID 3번 드라마 삭제
   morama delete --all --movie      # 모든 영화 기록 삭제
-  morama delete "인셉션" --movie    # 제목 기반 삭제`,
+  morama delete "인셉션" --movie     # 제목 기반 삭제`,
 	Args: cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		store, err := storage.NewStorage()
