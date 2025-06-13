@@ -318,6 +318,7 @@ func (s *Storage) FindAllByTitleAndType(title string, mediaType models.MediaType
 
 	return entries, nil
 }
+
 func (s *Storage) DeleteByTitleAndType(title string, mediaType models.MediaType) (int64, error) {
 	query := `
 		DELETE FROM media
