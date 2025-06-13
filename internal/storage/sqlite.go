@@ -337,3 +337,21 @@ func (s *Storage) DeleteByTitleAndType(title string, mediaType models.MediaType)
 
 	return rowsAffected, nil
 }
+
+func (s *Storage) DeleteByIDAndType(id int, mediaType models.MediaType) (int64, error) {
+	query := `DELETE FROM media WHERE id = ? AND type = ?`
+	result, err := s.db.Exec(query, id, string(mediaType))
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func (s *Storage) DeleteAllByType(mediaType models.MediaType) (int64, error) {
+	query := `DELETE FROM media WHERE type = ?`
+	result, err := s.db.Exec(query, string(mediaType))
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
