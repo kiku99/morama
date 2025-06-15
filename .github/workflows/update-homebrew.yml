@@ -1,0 +1,43 @@
+name: Update Homebrew Formula
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-formula:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Homebrew tap
+        uses: actions/checkout@v4
+        with:
+          repository: kiku99/homebrew-morama
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: homebrew-tap
+
+      - name: Get release info
+        id: release
+        uses: bruceadams/get-release@v3.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Calculate SHA256
+        id: sha
+        run: |
+          curl -L ${{ steps.release.outputs.tarball_url }} -o morama.tar.gz
+          echo "sha256=$(shasum -a 256 morama.tar.gz | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+
+      - name: Update Formula
+        run: |
+          cd homebrew-tap
+          sed -i "s|url \".*\"|url \"${{ steps.release.outputs.tarball_url }}\"|" Formula/morama.rb
+          sed -i "s|sha256 \".*\"|sha256 \"${{ steps.sha.outputs.sha256 }}\"|" Formula/morama.rb
+          sed -i "s|version \".*\"|version \"${{ steps.release.outputs.tag_name }}\"|" Formula/morama.rb
+
+      - name: Commit and push if changed
+        run: |
+          cd homebrew-tap
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add Formula/morama.rb
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update morama to ${{ steps.release.outputs.tag_name }}" && git push) 
