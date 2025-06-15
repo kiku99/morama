@@ -318,3 +318,40 @@ func (s *Storage) FindAllByTitleAndType(title string, mediaType models.MediaType
 
 	return entries, nil
 }
+
+func (s *Storage) DeleteByTitleAndType(title string, mediaType models.MediaType) (int64, error) {
+	query := `
+		DELETE FROM media
+		WHERE title = ? AND type = ?
+	`
+
+	result, err := s.db.Exec(query, title, string(mediaType))
+	if err != nil {
+		return 0, fmt.Errorf("삭제 실패: %v", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, fmt.Errorf("삭제된 행 수 확인 실패: %v", err)
+	}
+
+	return rowsAffected, nil
+}
+
+func (s *Storage) DeleteByIDAndType(id int, mediaType models.MediaType) (int64, error) {
+	query := `DELETE FROM media WHERE id = ? AND type = ?`
+	result, err := s.db.Exec(query, id, string(mediaType))
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func (s *Storage) DeleteAllByType(mediaType models.MediaType) (int64, error) {
+	query := `DELETE FROM media WHERE type = ?`
+	result, err := s.db.Exec(query, string(mediaType))
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}

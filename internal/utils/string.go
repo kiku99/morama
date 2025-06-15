@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/mattn/go-runewidth"
@@ -40,4 +41,8 @@ func MaxInt(a, b int) int {
 		return a
 	}
 	return b
+}
+
+func ParseID(input string) (int, error) {
+	return strconv.Atoi(input)
 }
