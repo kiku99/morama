@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://github.com/user-attachments/assets/6d71dac4-88e2-43e6-824a-fd1e48f2031e" alt="morama logo" width="80" />
   <h1 style="margin-top: 0em;">morama</h1>
-  <p><em>터미널에서 시작하는 나만의 영화/드라마 감상 아카이브</em></p>
+  <p><em>A CLI tool for managing your watched movies and dramas</em></p>
   <p>
     <img src="https://img.shields.io/badge/개발언어-Go-00ADD8?style=for-the-badge&logo=go" alt="Go" />
     <img src="https://img.shields.io/badge/개발기간-2024.05~2024.06-9E7B6B?style=for-the-badge" alt="개발기간" />
