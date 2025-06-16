@@ -1,0 +1,26 @@
+name: semantic-release POC
+on:
+  push:
+    branches: [main]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: semantic-release (dry-run)
+        uses: cycjimmy/semantic-release-action@v4
+        id: semrel
+        with:
+          extra_plugins: |
+            @semantic-release/changelog@^6
+            @semantic-release/git@^10
+        env:
+          GH_TOKEN:  ${{ secrets.GH_TOKEN }}
+
+      - name: 확인
+        if: steps.semrel.outputs.new_release_published == 'true'
+        run: echo "새 버전 ${{ steps.semrel.outputs.new_release_version }} 생성"
