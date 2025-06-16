@@ -11,7 +11,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: semantic-release (dry-run)
+      - name: semantic-release
         uses: cycjimmy/semantic-release-action@v4
         id: semrel
         with:
