@@ -118,7 +118,7 @@ func (s *Storage) GetAllEntries() ([]models.MediaEntry, error) {
 	query := `
 	SELECT id, title, type, rating, comment, date_watched, created_at
 	FROM media
-	ORDER BY date_watched DESC
+	ORDER BY id DESC
 	`
 
 	rows, err := s.db.Query(query)
@@ -168,7 +168,7 @@ func (s *Storage) GetEntriesByYear(year int) ([]models.MediaEntry, error) {
 	SELECT id, title, type, rating, comment, date_watched, created_at
 	FROM media
 	WHERE strftime('%Y', date_watched) = ?
-	ORDER BY date_watched DESC
+	ORDER BY id DESC
 	`
 
 	rows, err := s.db.Query(query, fmt.Sprintf("%d", year)) // 정수를 문자열로 변환
@@ -285,7 +285,7 @@ func (s *Storage) FindAllByTitleAndType(title string, mediaType models.MediaType
 	SELECT id, title, type, rating, comment, date_watched, created_at
 	FROM media
 	WHERE title = ? AND type = ?
-	ORDER BY date_watched DESC
+	ORDER BY id DESC
 	`
 
 	rows, err := s.db.Query(query, title, string(mediaType))
@@ -319,6 +319,7 @@ func (s *Storage) FindAllByTitleAndType(title string, mediaType models.MediaType
 	return entries, nil
 }
 
+// 삭제: 제목 + 타입 기반
 func (s *Storage) DeleteByTitleAndType(title string, mediaType models.MediaType) (int64, error) {
 	query := `
 		DELETE FROM media
@@ -338,6 +339,7 @@ func (s *Storage) DeleteByTitleAndType(title string, mediaType models.MediaType)
 	return rowsAffected, nil
 }
 
+// 삭제: ID + 타입 기반
 func (s *Storage) DeleteByIDAndType(id int, mediaType models.MediaType) (int64, error) {
 	query := `DELETE FROM media WHERE id = ? AND type = ?`
 	result, err := s.db.Exec(query, id, string(mediaType))
@@ -347,6 +349,7 @@ func (s *Storage) DeleteByIDAndType(id int, mediaType models.MediaType) (int64, 
 	return result.RowsAffected()
 }
 
+// 삭제: 특정 타입 전체 삭제
 func (s *Storage) DeleteAllByType(mediaType models.MediaType) (int64, error) {
 	query := `DELETE FROM media WHERE type = ?`
 	result, err := s.db.Exec(query, string(mediaType))
@@ -354,4 +357,30 @@ func (s *Storage) DeleteAllByType(mediaType models.MediaType) (int64, error) {
 		return 0, err
 	}
 	return result.RowsAffected()
+}
+
+// 업데이트: ID 기반
+func (s *Storage) UpdateEntry(id int, entry models.MediaEntry) error {
+	query := `
+	UPDATE media 
+	SET title = ?, type = ?, rating = ?, comment = ?, date_watched = ?
+	WHERE id = ?
+	`
+
+	now := time.Now().Format("2006-01-02 15:04:05")
+	result, err := s.db.Exec(query, entry.Title, string(entry.Type), entry.Rating, entry.Comment, now, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("no entry found with ID %d", id)
+	}
+
+	return nil
 }
