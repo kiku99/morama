@@ -43,7 +43,7 @@ morama show "inception" --movie
 
 기록 수정
 ```
-morama edit "Inception" --movie
+morama edit "inception" --movie
 ```
 
 기록 삭제
