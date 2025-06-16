@@ -17,7 +17,7 @@ jobs:
 
       - name: Get release info
         id: release
-        uses: bruceadams/get-release@v3.3
+        uses: bruceadams/get-release@v4.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
