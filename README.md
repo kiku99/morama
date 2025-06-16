@@ -48,7 +48,7 @@ morama edit "Inception" --movie
 
 기록 삭제
 ```
-morama delete id
+morama delete --id=3
 ```
 
 
