@@ -1,9 +1,9 @@
 class Morama < Formula
   desc "A CLI tool for managing your watched movies and dramas"
   homepage "https://github.com/kiku99/morama"
-  url "https://github.com/kiku99/morama/archive/refs/tags/v1.0.5.tar.gz"
-  sha256 "d244c7120de20e3c737b048ef470fd312d4b83eaf2b976ec8b4dc68035640e5e"
-  version "v1.0.5"
+  url "https://github.com/kiku99/morama/archive/refs/tags/v1.0.6.tar.gz"
+  sha256 "94ede474745582542ac75c92066a17a8ff3a45b6fb182849bea60d5a697ed7b1"
+  version "v1.0.6"
   license "MIT"
 
   depends_on "go" => :build
