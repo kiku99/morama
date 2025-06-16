@@ -23,6 +23,21 @@ morama lets you:
 
 ## Install
 
+### Using Homebrew (macOS/Linux)
+
+```bash
+# 1. Add the tap
+brew tap kiku99/morama https://github.com/kiku99/morama
+
+# 2. Install morama
+brew install morama
+```
+
+### Manual Installation
+
+1. Download the latest release from [GitHub Releases](https://github.com/kiku99/morama/releases)
+2. Extract and move the binary to your PATH
+
 <br>
 
 ## Usage
