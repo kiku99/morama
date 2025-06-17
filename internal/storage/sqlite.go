@@ -319,46 +319,6 @@ func (s *Storage) FindAllByTitleAndType(title string, mediaType models.MediaType
 	return entries, nil
 }
 
-// 삭제: 제목 + 타입 기반
-func (s *Storage) DeleteByTitleAndType(title string, mediaType models.MediaType) (int64, error) {
-	query := `
-		DELETE FROM media
-		WHERE title = ? AND type = ?
-	`
-
-	result, err := s.db.Exec(query, title, string(mediaType))
-	if err != nil {
-		return 0, fmt.Errorf("삭제 실패: %v", err)
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return 0, fmt.Errorf("삭제된 행 수 확인 실패: %v", err)
-	}
-
-	return rowsAffected, nil
-}
-
-// 삭제: ID + 타입 기반
-func (s *Storage) DeleteByIDAndType(id int, mediaType models.MediaType) (int64, error) {
-	query := `DELETE FROM media WHERE id = ? AND type = ?`
-	result, err := s.db.Exec(query, id, string(mediaType))
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected()
-}
-
-// 삭제: 특정 타입 전체 삭제
-func (s *Storage) DeleteAllByType(mediaType models.MediaType) (int64, error) {
-	query := `DELETE FROM media WHERE type = ?`
-	result, err := s.db.Exec(query, string(mediaType))
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected()
-}
-
 // 업데이트: ID 기반
 func (s *Storage) UpdateEntry(id int, entry models.MediaEntry) error {
 	query := `
@@ -383,4 +343,22 @@ func (s *Storage) UpdateEntry(id int, entry models.MediaEntry) error {
 	}
 
 	return nil
+}
+
+func (s *Storage) DeleteByID(id int) (int64, error) {
+	query := `DELETE FROM media WHERE id = ?`
+	result, err := s.db.Exec(query, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func (s *Storage) DeleteAll() (int64, error) {
+	query := `DELETE FROM media`
+	result, err := s.db.Exec(query)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
