@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/kiku99/morama/compare/v1.0.6...v1.1.0) (2025-06-17)
+
+
+### Features
+
+* `delete` command 구현 ([#8](https://github.com/kiku99/morama/issues/8)) ([68aace0](https://github.com/kiku99/morama/commit/68aace081722c7a511b4b7f9b1e5cf9c7d4d43be))
+
 ## [1.0.6](https://github.com/kiku99/morama/compare/v1.0.5...v1.0.6) (2025-06-16)
 
 ## [1.0.5](https://github.com/kiku99/morama/compare/v1.0.4...v1.0.5) (2025-06-16)
