@@ -319,6 +319,7 @@ func (s *Storage) FindAllByTitleAndType(title string, mediaType models.MediaType
 	return entries, nil
 }
 
+// 업데이트: ID 기반
 func (s *Storage) UpdateEntry(id int, entry models.MediaEntry) error {
 	query := `
 	UPDATE media 
@@ -326,7 +327,6 @@ func (s *Storage) UpdateEntry(id int, entry models.MediaEntry) error {
 	WHERE id = ?
 	`
 
-	// SQLite 호환 포맷으로 시간 저장
 	now := time.Now().Format("2006-01-02 15:04:05")
 	result, err := s.db.Exec(query, entry.Title, string(entry.Type), entry.Rating, entry.Comment, now, id)
 	if err != nil {
@@ -343,4 +343,22 @@ func (s *Storage) UpdateEntry(id int, entry models.MediaEntry) error {
 	}
 
 	return nil
+}
+
+func (s *Storage) DeleteByID(id int) (int64, error) {
+	query := `DELETE FROM media WHERE id = ?`
+	result, err := s.db.Exec(query, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func (s *Storage) DeleteAll() (int64, error) {
+	query := `DELETE FROM media`
+	result, err := s.db.Exec(query)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
