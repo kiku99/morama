@@ -15,10 +15,10 @@ import (
 
 var showCmd = &cobra.Command{
 	Use:   "show [title]",
-	Short: "선택한 영화 또는 드라마의 상세 정보를 출력합니다",
-	Long: `입력한 제목의 영화 또는 드라마 기록을 상세히 보여줍니다.
+	Short: "Display detailed information about a selected movie or drama",
+	Long: `Shows detailed information about the movie or drama with the given title.
 예시:
-  morama show "슬기로울 전공의 생활" --drama
+  morama show "언젠가는 슬기로울 전공의생활" --drama
   morama show "인셉션" --movie`,
 
 	Args: cobra.ExactArgs(1),
@@ -59,7 +59,7 @@ var showCmd = &cobra.Command{
 
 		for i, entry := range entries {
 			if len(entries) > 1 {
-				fmt.Printf("\n📄 결과 %d/%d\n", i+1, len(entries))
+				fmt.Printf("\n📄 Result %d/%d\n", i+1, len(entries))
 			}
 			printEntryBox(&entry)
 		}
@@ -78,11 +78,11 @@ func printEntryBox(entry *models.MediaEntry) {
 	c := cases.Title(language.Und)
 
 	fmt.Println(line)
-	fmt.Println(formatField("📌 제목", entry.Title, labelWidth))
-	fmt.Println(formatField("🎞️ 유형", c.String(string(entry.Type)), labelWidth))
-	fmt.Println(formatField("⭐ 평점", fmt.Sprintf("%.1f / 5.0", entry.Rating), labelWidth))
-	fmt.Println(formatField("🗓️ 시청일", entry.DateWatched.Format("2006-01-02"), labelWidth))
-	fmt.Println(formatField("💬 한줄평", entry.Comment, labelWidth))
+	fmt.Println(formatField("📌 Title", entry.Title, labelWidth))
+	fmt.Println(formatField("🎞️ Type", c.String(string(entry.Type)), labelWidth))
+	fmt.Println(formatField("⭐ Rating", fmt.Sprintf("%.1f / 5.0", entry.Rating), labelWidth))
+	fmt.Println(formatField("🗓️ Watched Date", entry.DateWatched.Format("2006-01-02"), labelWidth))
+	fmt.Println(formatField("💬 Comment", entry.Comment, labelWidth))
 	fmt.Println(line)
 }
 

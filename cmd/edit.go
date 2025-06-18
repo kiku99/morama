@@ -15,8 +15,8 @@ var editCmd = &cobra.Command{
 	Short: "Edit an existing movie or drama entry",
 	Long: `Edit an existing movie or drama entry by its ID.
 Example:
-  morama edit "드라마" --id=3 --drama
-  morama edit "영화" --id=5 --movie`,
+  morama edit "Drama Title" --id=3 --drama
+  morama edit "Movie Title" --id=5 --movie`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		title := args[0]

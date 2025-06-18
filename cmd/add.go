@@ -66,7 +66,7 @@ var addCmd = &cobra.Command{
 
 		// Interactive comment input
 		commentPrompt := promptui.Prompt{
-			Label: "한줄평",
+			Label: "One-line Review",
 		}
 
 		comment, err := commentPrompt.Run()

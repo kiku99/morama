@@ -14,25 +14,25 @@ var (
 
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "기록을 삭제합니다",
-	Long: `기록을 삭제합니다. --id로 단일 항목을 삭제하거나 --all로 전체 기록을 삭제할 수 있습니다.
+	Short: "Delete a record",
+	Long: `Deletes a record. You can delete a single entry using --id, or all entries using --all.
 
-예시:
-  morama delete --id=3     # ID 3번 항목 삭제
-  morama delete --all      # 전체 기록 삭제`,
+Examples:
+  morama delete --id=3     # Delete entry with ID 3
+  morama delete --all      # Delete all entries`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if deleteID == 0 && !deleteAll {
-			fmt.Println("❌ 삭제하려면 --id 또는 --all 중 하나를 지정하세요.")
+			fmt.Println("❌ Please specify either --id or --all to delete entries.")
 			return
 		}
 		if deleteID > 0 && deleteAll {
-			fmt.Println("❌ --id와 --all은 동시에 사용할 수 없습니다.")
+			fmt.Println("❌ --id and --all cannot be used together.")
 			return
 		}
 
 		store, err := storage.NewStorage()
 		if err != nil {
-			fmt.Printf("❌ 데이터베이스 열기 실패: %v\n", err)
+			fmt.Printf("❌ Failed to open the database: %v\n", err)
 			return
 		}
 		defer store.Close()
@@ -40,28 +40,28 @@ var deleteCmd = &cobra.Command{
 		if deleteAll {
 			count, err := store.DeleteAll()
 			if err != nil {
-				fmt.Printf("❌ 전체 삭제 실패: %v\n", err)
+				fmt.Printf("❌ Failed to delete all entries: %v\n", err)
 				return
 			}
-			fmt.Printf("🗑️ 모든 기록 %d개를 삭제했습니다.\n", count)
+			fmt.Printf("🗑️ Deleted all %d entries.\n", count)
 			return
 		}
 
 		deleted, err := store.DeleteByID(deleteID)
 		if err != nil {
-			fmt.Printf("❌ 삭제 실패: %v\n", err)
+			fmt.Printf("❌ Failed to delete entry: %v\n", err)
 			return
 		}
 		if deleted == 0 {
-			fmt.Printf("⚠️ ID %d 항목을 찾을 수 없습니다.\n", deleteID)
+			fmt.Printf("⚠️ No entry found with ID %d.\n", deleteID)
 		} else {
-			fmt.Printf("🗑️ ID %d 항목을 삭제했습니다.\n", deleteID)
+			fmt.Printf("🗑️ Deleted entry with ID %d.\n", deleteID)
 		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(deleteCmd)
-	deleteCmd.Flags().IntVar(&deleteID, "id", 0, "삭제할 항목 ID")
-	deleteCmd.Flags().BoolVar(&deleteAll, "all", false, "전체 기록 삭제")
+	deleteCmd.Flags().IntVar(&deleteID, "id", 0, "ID of the entry to delete")
+	deleteCmd.Flags().BoolVar(&deleteAll, "all", false, "Delete all entries")
 }
