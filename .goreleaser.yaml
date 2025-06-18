@@ -1,0 +1,73 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - main: ./main.go
+    binary: morama
+    ldflags:
+      - -X github.com/kiku99/morama/cmd.version={{.Version}}
+      - -X github.com/kiku99/morama/cmd.commit={{.Commit}}
+      - -X github.com/kiku99/morama/cmd.date={{.Date}}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+release:
+  github:
+    owner: kiku99
+    name: morama
+
+# Homebrew Formula 자동 업데이트
+brews:
+  - name: morama
+    description: "A CLI tool for managing your watched movies and dramas"
+    homepage: "https://github.com/kiku99/morama"
+    license: "MIT"
+    
+    # 현재 리포지토리의 Formula 디렉토리에 직접 업데이트
+    repository:
+      owner: kiku99
+      name: morama
+      branch: main
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    
+    # Formula 파일 경로
+    folder: Formula
+    
+    # 의존성
+    dependencies:
+      - name: go
+        type: build
+    
+    # 설치 스크립트
+    install: |
+      bin.install "morama"
+    
+    # 테스트 스크립트
+    test: |
+      system "#{bin}/morama", "version"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:' 

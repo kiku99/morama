@@ -11,6 +11,12 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+          
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.3'
+          
       - name: semantic-release
         uses: cycjimmy/semantic-release-action@v4
         id: semrel
@@ -19,8 +25,18 @@ jobs:
             @semantic-release/changelog@^6
             @semantic-release/git@^10
         env:
-          GH_TOKEN:  ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Run GoReleaser
+        if: steps.semrel.outputs.new_release_published == 'true'
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: 확인
         if: steps.semrel.outputs.new_release_published == 'true'
-        run: echo "새 버전 ${{ steps.semrel.outputs.new_release_version }} 생성"
+        run: echo "새 버전 ${{ steps.semrel.outputs.new_release_version }} 생성 및 GoReleaser로 빌드 완료"
