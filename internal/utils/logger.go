@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/kiku99/morama/internal/config"
 )
 
 // 로그 레벨 정의
@@ -147,11 +149,23 @@ func (l *Logger) LogDatabaseOperation(operation, table string, duration time.Dur
 // 전역 Logger 인스턴스
 var globalLogger *Logger
 
-// 전역 Logger 초기화
+// 전역 Logger 초기화 (직접 레벨 지정)
 func InitLogger(level LogLevel) error {
 	var err error
 	globalLogger, err = NewLogger(level)
 	return err
+}
+
+// 전역 Logger 초기화 (config.yaml 기반)
+func InitLoggerFromConfig() error {
+	cfg := config.GetConfig()
+	level := LogLevelInfo
+	if cfg.DebugMode {
+		level = LogLevelDebug
+	} else {
+		level = LogLevelWarning
+	}
+	return InitLogger(level)
 }
 
 // 전역 Logger 반환

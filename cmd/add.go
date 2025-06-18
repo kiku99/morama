@@ -3,9 +3,12 @@ package cmd
 import (
 	"fmt"
 	"strconv"
+	"time"
 
+	"github.com/kiku99/morama/internal/config"
 	"github.com/kiku99/morama/internal/models"
 	"github.com/kiku99/morama/internal/storage"
+	"github.com/kiku99/morama/internal/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
@@ -16,7 +19,13 @@ var addCmd = &cobra.Command{
 	Long:  "Add a new movie or drama entry with interactive rating and comment input",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		startTime := time.Now()
+		defer func() {
+			utils.LogCommandExecution("add", args, time.Since(startTime))
+		}()
+
 		title := args[0]
+		utils.LogUserAction("add_entry", fmt.Sprintf("title: %s", title))
 
 		// Determine media type from flags
 		isMovie, _ := cmd.Flags().GetBool("movie")
@@ -24,15 +33,19 @@ var addCmd = &cobra.Command{
 
 		var mediaType models.MediaType
 		if isMovie && isDrama {
-			fmt.Println("❌ Error: Cannot specify both --movie and --drama flags")
-			return
+			utils.HandleError(
+				utils.ValidationError("Cannot specify both --movie and --drama flags", nil),
+				"Invalid media type specification",
+			)
 		} else if isMovie {
 			mediaType = models.Movie
 		} else if isDrama {
 			mediaType = models.Drama
 		} else {
-			fmt.Println("❌ Error: Must specify either --movie or --drama flag")
-			return
+			utils.HandleError(
+				utils.ValidationError("Must specify either --movie or --drama flag", nil),
+				"Missing media type specification",
+			)
 		}
 
 		// Interactive rating input
@@ -43,8 +56,10 @@ var addCmd = &cobra.Command{
 
 		ratingStr, err := ratingPrompt.Run()
 		if err != nil {
-			fmt.Printf("❌ Error getting rating: %v\n", err)
-			return
+			utils.HandleError(
+				utils.UserInputError("Failed to get rating input", err),
+				"Rating input error",
+			)
 		}
 
 		rating, _ := strconv.ParseFloat(ratingStr, 64)
@@ -56,15 +71,19 @@ var addCmd = &cobra.Command{
 
 		comment, err := commentPrompt.Run()
 		if err != nil {
-			fmt.Printf("❌ Error getting comment: %v\n", err)
-			return
+			utils.HandleError(
+				utils.UserInputError("Failed to get comment input", err),
+				"Comment input error",
+			)
 		}
 
 		// Load storage
 		store, err := storage.NewStorage()
 		if err != nil {
-			fmt.Printf("❌ Error loading storage: %v\n", err)
-			return
+			utils.HandleError(
+				utils.DatabaseError("Failed to initialize storage", err),
+				"Storage initialization error",
+			)
 		}
 		defer store.Close()
 
@@ -78,10 +97,13 @@ var addCmd = &cobra.Command{
 
 		// Add entry
 		if err := store.AddEntry(entry); err != nil {
-			fmt.Printf("❌ Error saving entry: %v\n", err)
-			return
+			utils.HandleError(
+				utils.DatabaseError("Failed to save entry", err),
+				"Entry save error",
+			)
 		}
 
+		utils.LogUserAction("entry_added", fmt.Sprintf("title: %s, type: %s, rating: %.1f", title, mediaType, rating))
 		fmt.Println("✅ Successfully saved!")
 	},
 }
@@ -91,8 +113,10 @@ func validateRating(input string) error {
 	if err != nil {
 		return fmt.Errorf("invalid number")
 	}
-	if rating < 0 || rating > 5 {
-		return fmt.Errorf("rating must be between 0 and 5")
+
+	cfg := config.GetConfig()
+	if rating < 0 || rating > cfg.Display.RatingScale {
+		return fmt.Errorf("rating must be between 0 and %.1f", cfg.Display.RatingScale)
 	}
 	return nil
 }

@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
+	"github.com/kiku99/morama/internal/config"
 	"github.com/kiku99/morama/internal/storage"
 	"github.com/kiku99/morama/internal/utils"
 	"github.com/spf13/cobra"
@@ -87,22 +89,34 @@ var listCmd = &cobra.Command{
 	Short: "List all movies and dramas",
 	Long:  "Display all recorded movies and dramas in a formatted table",
 	Run: func(cmd *cobra.Command, args []string) {
+		startTime := time.Now()
+		defer func() {
+			utils.LogCommandExecution("list", args, time.Since(startTime))
+		}()
+
+		utils.LogUserAction("list_entries", "requested")
+
 		store, err := storage.NewStorage()
 		if err != nil {
-			fmt.Printf("❌ Error loading storage: %v\n", err)
-			return
+			utils.HandleError(
+				utils.DatabaseError("Failed to initialize storage", err),
+				"Storage initialization error",
+			)
 		}
 		defer store.Close()
 
 		// Get all years
 		years, err := store.GetYears()
 		if err != nil {
-			fmt.Printf("❌ Error getting years: %v\n", err)
-			return
+			utils.HandleError(
+				utils.DatabaseError("Failed to retrieve years", err),
+				"Year retrieval error",
+			)
 		}
 
 		if len(years) == 0 {
 			fmt.Println("📭 No entries found. Add some movies or dramas with 'morama add'!")
+			utils.LogUserAction("list_empty", "no entries found")
 			return
 		}
 
@@ -113,7 +127,7 @@ var listCmd = &cobra.Command{
 		for _, year := range years {
 			entries, err := store.GetEntriesByYear(year)
 			if err != nil {
-				fmt.Printf("❌ Error getting entries for year %d: %v\n", year, err)
+				utils.Error("Failed to get entries for year %d: %v", year, err)
 				continue
 			}
 
@@ -148,12 +162,13 @@ var listCmd = &cobra.Command{
 				strings.Repeat("━", widths.date),
 				strings.Repeat("━", widths.comment))
 
+			config := config.GetConfig()
 			for _, entry := range entries {
 				id := fmt.Sprintf("%d", entry.ID)
 				title := utils.TruncateStringWithWidth(entry.Title, widths.title)
 				entryType := string(entry.Type)
 				rating := fmt.Sprintf("%.1f", entry.Rating)
-				dateStr := entry.DateWatched.Format("Jan 02, 2006")
+				dateStr := entry.DateWatched.Format(config.Display.DateFormat)
 				comment := utils.TruncateStringWithWidth(entry.Comment, widths.comment)
 
 				fmt.Printf("│%s│%s│%s│%s│%s│%s│\n",
@@ -173,6 +188,8 @@ var listCmd = &cobra.Command{
 				strings.Repeat("─", widths.date),
 				strings.Repeat("─", widths.comment))
 		}
+
+		utils.LogUserAction("list_completed", fmt.Sprintf("displayed %d years", len(years)))
 	},
 }
 
