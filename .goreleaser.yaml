@@ -50,7 +50,7 @@ brews:
       token: "{{ .Env.GITHUB_TOKEN }}"
     
     # Formula 파일 경로
-    folder: Formula
+    directory: Formula
     
     # 의존성
     dependencies:
