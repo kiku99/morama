@@ -245,41 +245,6 @@ func (s *Storage) GetYears() ([]int, error) {
 	return years, rows.Err()
 }
 
-func (s *Storage) GetStats() (map[string]interface{}, error) {
-	stats := make(map[string]interface{})
-
-	// Total count
-	var total int
-	err := s.db.QueryRow("SELECT COUNT(*) FROM media").Scan(&total)
-	if err != nil {
-		return nil, err
-	}
-	stats["total"] = total
-
-	// Count by type
-	var movieCount, dramaCount int
-	err = s.db.QueryRow("SELECT COUNT(*) FROM media WHERE type = 'movie'").Scan(&movieCount)
-	if err != nil {
-		return nil, err
-	}
-	err = s.db.QueryRow("SELECT COUNT(*) FROM media WHERE type = 'drama'").Scan(&dramaCount)
-	if err != nil {
-		return nil, err
-	}
-	stats["movies"] = movieCount
-	stats["dramas"] = dramaCount
-
-	// Average rating
-	var avgRating float64
-	err = s.db.QueryRow("SELECT AVG(rating) FROM media WHERE rating > 0").Scan(&avgRating)
-	if err != nil {
-		return nil, err
-	}
-	stats["avg_rating"] = avgRating
-
-	return stats, nil
-}
-
 func (s *Storage) FindAllByTitleAndType(title string, mediaType models.MediaType) ([]models.MediaEntry, error) {
 	query := `
 	SELECT id, title, type, rating, comment, date_watched, created_at
@@ -361,4 +326,99 @@ func (s *Storage) DeleteAll() (int64, error) {
 		return 0, err
 	}
 	return result.RowsAffected()
+}
+
+func (s *Storage) GetStats() (map[string]interface{}, error) {
+	stats := make(map[string]interface{})
+
+	// Total counts
+	var totalMovies, totalDramas int
+	err := s.db.QueryRow("SELECT COUNT(*) FROM media WHERE type = 'movie'").Scan(&totalMovies)
+	if err != nil {
+		return nil, err
+	}
+	err = s.db.QueryRow("SELECT COUNT(*) FROM media WHERE type = 'drama'").Scan(&totalDramas)
+	if err != nil {
+		return nil, err
+	}
+	stats["total_movies"] = totalMovies
+	stats["total_dramas"] = totalDramas
+
+	// Average ratings
+	var avgMovieRating, avgDramaRating, avgOverallRating float64
+	s.db.QueryRow("SELECT AVG(rating) FROM media WHERE type = 'movie' AND rating > 0").Scan(&avgMovieRating)
+	s.db.QueryRow("SELECT AVG(rating) FROM media WHERE type = 'drama' AND rating > 0").Scan(&avgDramaRating)
+	s.db.QueryRow("SELECT AVG(rating) FROM media WHERE rating > 0").Scan(&avgOverallRating)
+
+	stats["avg_movie_rating"] = avgMovieRating
+	stats["avg_drama_rating"] = avgDramaRating
+	stats["avg_overall_rating"] = avgOverallRating
+
+	// Rating distribution
+	ratingDistribution := make(map[string]int)
+	rows, err := s.db.Query(`
+		SELECT 
+			CASE 
+				WHEN rating >= 4.5 THEN '4.5'
+				WHEN rating >= 4.0 THEN '4.0'
+				WHEN rating >= 3.5 THEN '3.5'
+				WHEN rating >= 3.0 THEN '3.0'
+				WHEN rating >= 2.5 THEN '2.5'
+				WHEN rating >= 2.0 THEN '2.0'
+				WHEN rating >= 1.5 THEN '1.5'
+				WHEN rating >= 1.0 THEN '1.0'
+				ELSE '0.5'
+			END as rating_range,
+			COUNT(*) as count
+		FROM media
+		GROUP BY rating_range
+		ORDER BY rating_range DESC
+	`)
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			var ratingRange string
+			var count int
+			if err := rows.Scan(&ratingRange, &count); err == nil {
+				ratingDistribution[ratingRange] = count
+			}
+		}
+	}
+	stats["rating_distribution"] = ratingDistribution
+
+	// Yearly breakdown
+	yearlyStats := make(map[string]interface{})
+	yearRows, err := s.db.Query(`
+		SELECT 
+			strftime('%Y', date_watched) as year,
+			COUNT(CASE WHEN type = 'movie' THEN 1 END) as movies,
+			COUNT(CASE WHEN type = 'drama' THEN 1 END) as dramas,
+			AVG(rating) as avg_rating
+		FROM media
+		GROUP BY year
+		ORDER BY year DESC
+	`)
+	if err == nil {
+		defer yearRows.Close()
+		for yearRows.Next() {
+			var year string
+			var movies, dramas int
+			var avgRating float64
+			if err := yearRows.Scan(&year, &movies, &dramas, &avgRating); err == nil {
+				yearlyStats[year] = map[string]interface{}{
+					"movies":     movies,
+					"dramas":     dramas,
+					"avg_rating": avgRating,
+				}
+			}
+		}
+	}
+	stats["yearly_stats"] = yearlyStats
+
+	// Last watched
+	var lastWatched string
+	s.db.QueryRow("SELECT date_watched FROM media ORDER BY date_watched DESC LIMIT 1").Scan(&lastWatched)
+	stats["last_watched"] = lastWatched
+
+	return stats, nil
 }
