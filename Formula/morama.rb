@@ -5,23 +5,23 @@
 class Morama < Formula
   desc "A CLI tool for managing your watched movies and dramas"
   homepage "https://github.com/kiku99/morama"
-  version "1.1.2"
+  version "1.1.3"
   license "MIT"
 
   depends_on "go" => :build
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/kiku99/morama/releases/download/v1.1.2/morama_1.1.2_darwin_amd64.tar.gz"
-      sha256 "d94bba9a5478a4ce905c61afffbb5b25d95f262304c90fbe3ebb843a6185da6c"
+      url "https://github.com/kiku99/morama/releases/download/v1.1.3/morama_1.1.3_darwin_amd64.tar.gz"
+      sha256 "598a183559f73f256305519667abf440416296b025d0cfe64ba7a335e39afb00"
 
       def install
         bin.install "morama"
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/kiku99/morama/releases/download/v1.1.2/morama_1.1.2_darwin_arm64.tar.gz"
-      sha256 "2a5426d6585f677a6d9af9dc82b678c327b4095a85242c6d97b666826ed514ac"
+      url "https://github.com/kiku99/morama/releases/download/v1.1.3/morama_1.1.3_darwin_arm64.tar.gz"
+      sha256 "55706d5d2bb711fac238405c3d25ce080297139469e8f6005a1daf0a315092b0"
 
       def install
         bin.install "morama"
@@ -31,15 +31,15 @@ class Morama < Formula
 
   on_linux do
     if Hardware::CPU.intel? and Hardware::CPU.is_64_bit?
-      url "https://github.com/kiku99/morama/releases/download/v1.1.2/morama_1.1.2_linux_amd64.tar.gz"
-      sha256 "83f328bd1d5890fd151fb8389667f8b9c279388c1579f34983de2df33053ced6"
+      url "https://github.com/kiku99/morama/releases/download/v1.1.3/morama_1.1.3_linux_amd64.tar.gz"
+      sha256 "a2ee7681544fc66fa327a7033ed3f704643691bc64d062f8828ebb674edc3130"
       def install
         bin.install "morama"
       end
     end
     if Hardware::CPU.arm? and Hardware::CPU.is_64_bit?
-      url "https://github.com/kiku99/morama/releases/download/v1.1.2/morama_1.1.2_linux_arm64.tar.gz"
-      sha256 "96bee34dc202f4a1f07156114f60a9d6e69e0ab2235bc57c332955df203ee5be"
+      url "https://github.com/kiku99/morama/releases/download/v1.1.3/morama_1.1.3_linux_arm64.tar.gz"
+      sha256 "b69156f8cfef075a278e9b48f467f23f2d2f821058af13534b3727fb1dced77d"
       def install
         bin.install "morama"
       end
