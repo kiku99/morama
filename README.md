@@ -3,27 +3,30 @@
   <h1 style="margin-top: 0em;">morama</h1>
   <p><em>A CLI tool for managing your watched movies and dramas</em></p>
   <p>
-    <img src="https://img.shields.io/badge/개발언어-Go-00ADD8?style=for-the-badge&logo=go" alt="Go" />
-    <img src="https://img.shields.io/badge/개발기간-2024.05~2024.06-9E7B6B?style=for-the-badge" alt="개발기간" />
+    <img src="https://img.shields.io/badge/Built_with-Go-00ADD8?style=for-the-badge&logo=go" alt="Go" />
+    <img src="https://img.shields.io/badge/Database-SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
+    <img src="https://img.shields.io/badge/Development-2024.05~2024.06-9E7B6B?style=for-the-badge" alt="Development Period" />
   </p>
 </div>
 
+<br>
 
 ## Overview
 
-**morama** is a simple command-line interface (CLI) application for recording and managing your personal reviews and ratings for movies and TV dramas. Built with Go, morama helps you keep track of what you've watched and how you felt about it — all from your terminal.
+**morama** is a simple command-line interface (CLI) application for recording and managing personal reviews and ratings for movies and TV dramas. Built in Go, it helps you keep track of what you’ve watched — and how you felt about it — all from your terminal.
 
-morama lets you:
-- Record reviews and star ratings for movies and dramas.
-- Browse and search your personal watch history.
-- Categorize and filter entries by title, genre, or rating.
-- Easily update or delete entries as your opinions evolve.
+### Features
+- Add reviews and star ratings for movies and dramas
+- Browse and search your viewing history
+- Filter by title, genre, or rating
+- Edit or delete existing entries
+- View yearly breakdowns and rating statistics
 
 <br>
 
-## Install
+## Installation
 
-### Using Homebrew (macOS/Linux)
+### With Homebrew
 
 ```bash
 # 1. Add the tap
@@ -33,40 +36,104 @@ brew tap kiku99/morama https://github.com/kiku99/morama
 brew install morama
 ```
 
-### Manual Installation
+<br>
 
-1. Download the latest release from [GitHub Releases](https://github.com/kiku99/morama/releases)
-2. Extract and move the binary to your PATH
+## CLI Command Structure
+
+```
+morama
+├── add [title]                    # Add a new entry
+│   ├── --movie                   # Add as a movie
+│   └── --drama                   # Add as a drama
+│
+├── list                          # View all records (grouped by year)
+│
+├── show [title]                  # Show details of a specific entry
+│   ├── --movie                   # Specify movie
+│   └── --drama                   # Specify drama
+│
+├── edit [title]                  # Edit an existing entry
+│   ├── --id=<ID>                 # Target entry ID (required)
+│   ├── --movie                   # Edit as a movie
+│   └── --drama                   # Edit as a drama
+│
+├── delete                        # Delete entries
+│   ├── --id=<ID>                 # Delete by ID
+│   └── --all                     # Delete all records
+│
+├── stats                         # Show statistics
+│
+└── version                       # Show current version
+```
 
 <br>
 
-## Usage
-새로운 감상 기록 추가
-```
-morama add "inception" --movie
+## Examples
+
+**Add a movie**
+
+```bash
+morama add "Inception" --movie
 ```
 
-모든 기록 조회
+**Add a drama**
+
+```bash
+morama add "Hospital Playlist" --drama
 ```
+
+**View all records**
+
+```bash
 morama list
 ```
 
-특정 제목 상세 조회
-```
-morama show "inception" --movie
+**Show details of a movie**
+
+```bash
+morama show "Inception" --movie
 ```
 
-기록 수정
-```
-morama edit "inception" --movie
+**Edit a record by ID**
+
+```bash
+morama edit "Inception" --id=3 --movie
 ```
 
-기록 삭제
-```
+**Delete a record by ID**
+
+```bash
 morama delete --id=3
 ```
 
-### 주석 추가
-test
+**Delete all records**
 
+```bash
+morama delete --all
+```
 
+**Show statistics**
+
+```bash
+morama stats
+```
+
+**Show version**
+
+```bash
+morama version
+```
+
+<br>
+
+## License
+
+This project is licensed under the MIT License.  
+See the [LICENSE](LICENSE) file for full details.
+
+<br>
+
+## Contributing
+
+Contributions are welcome!  
+Feel free to open issues or submit pull requests to help improve **morama**.
