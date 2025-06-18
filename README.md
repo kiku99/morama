@@ -67,7 +67,7 @@ morama delete --id=3
 ```
 
 ### 주석 추가
-test
+
 
 
 
