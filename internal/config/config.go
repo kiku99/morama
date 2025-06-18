@@ -9,8 +9,9 @@ import (
 
 // Config 설정 구조체
 type Config struct {
-	Display DisplayConfig `yaml:"display"`
-	Search  SearchConfig  `yaml:"search"`
+	Display   DisplayConfig `yaml:"display"`
+	Search    SearchConfig  `yaml:"search"`
+	DebugMode bool          `yaml:"debug_mode"`
 }
 
 // DisplayConfig 출력 관련 설정
@@ -40,6 +41,7 @@ func DefaultConfig() *Config {
 			CaseSensitive: false,
 			MaxResults:    50,
 		},
+		DebugMode: false,
 	}
 }
 
@@ -113,6 +115,8 @@ func mergeWithDefaults(config Config) *Config {
 	if config.Search.MaxResults == 0 {
 		config.Search.MaxResults = defaults.Search.MaxResults
 	}
+
+	config.DebugMode = config.DebugMode || defaults.DebugMode
 
 	return &config
 }
