@@ -1,11 +1,10 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/6d71dac4-88e2-43e6-824a-fd1e48f2031e" alt="morama logo" width="80" />
-  <h1 style="margin-top: 0em;">morama</h1>
+  <img src="https://github.com/user-attachments/assets/28ad7854-f6a7-4cd1-b904-4d7d72251f16" alt="morama logo" width="175" />
   <p><em>A CLI tool for managing your watched movies and dramas</em></p>
-  <p>
+  <p style="margin: 0; line-height: 1;">
     <img src="https://img.shields.io/badge/Built_with-Go-00ADD8?style=for-the-badge&logo=go" alt="Go" />
     <img src="https://img.shields.io/badge/Database-SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
-    <img src="https://img.shields.io/badge/Development-2024.05~2024.06-9E7B6B?style=for-the-badge" alt="Development Period" />
+    <img src="https://img.shields.io/badge/Development-2025.05~ing-9E7B6B?style=for-the-badge" alt="Development Period" />
   </p>
 </div>
 
@@ -13,7 +12,7 @@
 
 ## Overview
 
-**morama** is a simple command-line interface (CLI) application for recording and managing personal reviews and ratings for movies and TV dramas. Built in Go, it helps you keep track of what you’ve watched — and how you felt about it — all from your terminal.
+**morama** is a simple command-line interface (CLI) application for recording and managing personal reviews and ratings for movies and dramas. Built in Go, it helps you keep track of what you’ve watched — and how you felt about it — all from your terminal.
 
 ### Features
 - Add reviews and star ratings for movies and dramas
@@ -42,7 +41,7 @@ brew install morama
 
 ```
 morama
-├── add [title]                    # Add a new entry
+├── add [title]                   # Add a new entry
 │   ├── --movie                   # Add as a movie
 │   └── --drama                   # Add as a drama
 │
