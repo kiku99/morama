@@ -14,6 +14,8 @@
 
 **morama** is a simple command-line interface (CLI) application for recording and managing personal reviews and ratings for movies and dramas. Built in Go, it helps you keep track of what you’ve watched — and how you felt about it — all from your terminal.
 
+![morama demo](assets/morama-demo.gif)
+
 ### Features
 - Add reviews and star ratings for movies and dramas
 - Browse and search your viewing history
