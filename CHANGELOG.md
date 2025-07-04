@@ -1,3 +1,10 @@
+## [1.1.7](https://github.com/kiku99/morama/compare/v1.1.6...v1.1.7) (2025-07-04)
+
+
+### Bug Fixes
+
+* Update .releaserc.yaml ([f6c33d1](https://github.com/kiku99/morama/commit/f6c33d16d0bf08554dd13d98aa8a90c4239fdda7))
+
 ## [1.1.6](https://github.com/kiku99/morama/compare/v1.1.5...v1.1.6) (2025-07-02)
 
 ## [1.1.5](https://github.com/kiku99/morama/compare/v1.1.4...v1.1.5) (2025-07-02)
