@@ -13,11 +13,10 @@ analyzeCommits:
     - type: fix
       release: patch
     - type: docs
-      release: skip
+      release: false
     - type: refactor
       release: patch
     - type: breaking
       release: major
     - type: chore
-      release: skip
-
+      release: false
