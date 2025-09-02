@@ -139,3 +139,6 @@ See the [LICENSE](LICENSE) file for full details.
 Contributions are welcome!  
 Feel free to open issues or submit pull requests to help improve **morama**.
  
+
+
+<!-- Security scan triggered at 2025-09-02 16:17:35 -->
